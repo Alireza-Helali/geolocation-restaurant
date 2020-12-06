@@ -7,6 +7,7 @@ from .forms import RestaurantModelForm
 from django.contrib.gis.geoip2 import GeoIP2
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
+from geopy.distance import geodesic
 
 
 # Create your views here.
@@ -65,10 +66,12 @@ def show_nearby_restaurant(request):
     m = folium.Map(width=800, height=400, zoom_start=12, location=user_location, no_touch=False)
     folium.Marker(location=user_location, tooltip='Click', popup='Your Position', icon=folium.Icon(color='red')).add_to(
         m)
-    nearby_restaurant = RestaurantModel.objects.annotate(distance=Distance('location', point)).order_by('distance')[0:6]
+    nearby_restaurant = RestaurantModel.objects.all()
     for res in nearby_restaurant:
-        folium.Circle(location=(res.latitude, res.longitude), color='red', fill=True, weight=0,
-                      radius=res.service, popup=res.name).add_to(m)
+        distance = int(geodesic((res.latitude, res.longitude), user_location).meters)
+        if res.service >= distance:
+            folium.Circle(location=(res.latitude, res.longitude), color='red', fill=True, weight=0,
+                          radius=res.service, popup=res.name).add_to(m)
     if form.is_valid():
         form_location = form.cleaned_data.get('location')
         user_location = geolocator.geocode(form_location)
