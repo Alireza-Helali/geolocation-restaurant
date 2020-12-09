@@ -5,8 +5,6 @@ from geopy.geocoders import Nominatim
 import folium
 from .forms import RestaurantModelForm
 from django.contrib.gis.geoip2 import GeoIP2
-from django.contrib.gis.geos import Point
-from django.contrib.gis.db.models.functions import Distance
 from geopy.distance import geodesic
 
 
@@ -62,22 +60,22 @@ def show_nearby_restaurant(request):
     ip = '178.169.27.223'  # change content with get_client_ip(request) in deploying stage.
     l_lat, l_lon = get_user_ip(ip)
     user_location = (l_lat, l_lon)
-    point = Point(l_lat, l_lon, srid=4326)
     m = folium.Map(width=800, height=400, zoom_start=12, location=user_location, no_touch=False)
     folium.Marker(location=user_location, tooltip='Click', popup='Your Position', icon=folium.Icon(color='red')).add_to(
         m)
     nearby_restaurant = RestaurantModel.objects.all()
     for res in nearby_restaurant:
         distance = int(geodesic((res.latitude, res.longitude), user_location).meters)
-        if res.service >= distance:
-            folium.Circle(location=(res.latitude, res.longitude), color='red', fill=True, weight=0,
-                          radius=res.service, popup=res.name).add_to(m)
+        if 1000 >= distance:
+            folium.Marker(location=(res.latitude, res.longitude), tooltip='Click', popup=f"{res.service} m",
+                          icon=folium.Icon(color='blue')).add_to(
+                m)
     if form.is_valid():
         form_location = form.cleaned_data.get('location')
         user_location = geolocator.geocode(form_location)
         lat, lon = user_location.latitude, user_location.longitude
         lat_lon = (lat, lon)
-        m = folium.Map(width=800, height=400, zoom_start=10, location=lat_lon)
+        m = folium.Map(width=800, height=400, zoom_start=14, location=lat_lon)
         folium.ClickForMarker().add_to(m)
     m = m._repr_html_()
     context = {
