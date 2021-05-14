@@ -70,6 +70,8 @@ def show_nearby_restaurant(request):
             folium.Marker(location=(res.latitude, res.longitude), tooltip='Click', popup=f"{res.service} m",
                           icon=folium.Icon(color='blue')).add_to(
                 m)
+            # folium.Circle(location=(res.latitude, res.longitude), color='red', fill=True, weight=0,
+            #               radius=res.service).add_to(m)
     if form.is_valid():
         form_location = form.cleaned_data.get('location')
         user_location = geolocator.geocode(form_location)

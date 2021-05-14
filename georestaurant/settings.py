@@ -24,7 +24,7 @@ SECRET_KEY = 'ks#+rr$3z2h_dti=l7%0l&zvnk)xyterfu&)4mpv#(3=qsi2d5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'localhost']
 
 # Application definition
 
@@ -121,11 +121,6 @@ USE_TZ = True
 
 GEOIP_PATH = BASE_DIR / 'geoip'
 STATIC_URL = '/static/'
+import os
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-MEDIA_ROOT = BASE_DIR / 'media/'
-
-MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
